@@ -1,0 +1,19 @@
+[Unit]
+Description=havijMQ Service
+After=docker.service
+Conflicts=getty@tty1.service
+StartLimitBurst=1000000000
+StartLimitIntervalSec=1000000000
+
+[Service]
+Type=simple
+User=alaa
+ExecStart=/usr/bin/python3 -u /home/alaa/havijMQ/consumer.py
+StandardInput=tty-force
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=havijMQ
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
