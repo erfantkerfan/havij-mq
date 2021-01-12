@@ -61,6 +61,10 @@ RabbitMQ consumer APP
         'LumenServer': os.getenv("LumenServer", 'localhost'),
         'LumenPort': int(os.getenv("LumenPort", 80)),
     }
+    print(
+        "======== Running on {} ========\n"
+        "(Press CTRL+BREAK to quit)".format(CONFIG['LumenPort'])
+    )
 
 
 def balance():
