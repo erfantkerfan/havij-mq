@@ -30,7 +30,7 @@ async def handle(request):
     response.update({
         'method': request.method,
         'url': request.path,
-        # 'token': request.headers['Authorization'],
+        'token': request.headers['Authorization'],
     })
     channel.basic_publish(exchange='',
                           routing_key=CONFIG['RabbitMQQueue'],
