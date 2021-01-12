@@ -100,12 +100,11 @@ def send_request(ch, method, properties, body):
     message = json.loads(body)
     HEADERS['Authorization'] = message['token']
     payload = message
-    response = requests.request(message['method'], CONFIG['LumenSchema'] + CONFIG['LumenServer'] + message['url'],
-                                headers=HEADERS, data=payload)
     try:
+        response = requests.request(message['method'], CONFIG['LumenSchema'] + CONFIG['LumenServer'] + message['url'], headers=HEADERS, data=payload)
         status_code = response.status_code
         if status_code != 200:
-            logging.critical('request failed')
+            logging.critical('request non 200')
         data = json.loads(response.content)
         logging.debug(status_code)
         logging.debug(data)
