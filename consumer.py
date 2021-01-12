@@ -98,7 +98,7 @@ def connection():
 def send_request(ch, method, properties, body):
     start = datetime.datetime.now()
     message = json.loads(body)
-    HEADERS['Authorization'] = 'Bearer ' + message['token']
+    HEADERS['Authorization'] = message['token']
     payload = message
     response = requests.request(message['method'], CONFIG['LumenSchema'] + CONFIG['LumenServer'] + message['url'],
                                 headers=HEADERS, data=payload)
