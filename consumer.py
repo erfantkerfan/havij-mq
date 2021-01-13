@@ -68,14 +68,15 @@ RabbitMQ consumer APP
 
 
 def balance():
+    threads = []
     try:
-        threads = []
-        while threading.activeCount() > CONFIG['SIMULTANEOUS_THREADS']:
-            pass
-        threads = [t for t in threads if t.is_alive()]
+        while True:
+            while threading.activeCount() > CONFIG['SIMULTANEOUS_THREADS']:
+                pass
+            threads = [t for t in threads if t.is_alive()]
+            threads.append(Thread(target=connection))
+            threads[-1].start()
 
-        threads.append(Thread(target=connection))
-        threads[-1].start()
     except KeyboardInterrupt:
         exit()
 
@@ -103,9 +104,9 @@ def send_request(ch, method, properties, body):
     start = datetime.datetime.now()
     message = json.loads(body)
     HEADERS['Authorization'] = message['token']
-    payload = message
     try:
-        response = requests.request(message['method'], CONFIG['LumenSchema'] + CONFIG['LumenServer'] + message['url'], headers=HEADERS, data=payload)
+        response = requests.request(message['method'], CONFIG['LumenSchema'] + CONFIG['LumenServer'] + message['url'],
+                                    headers=HEADERS, data=message)
         status_code = response.status_code
         if status_code != 200:
             logging.critical('request non 200')
@@ -114,21 +115,10 @@ def send_request(ch, method, properties, body):
         logging.debug(data)
     except:
         logging.critical('request failed')
-    # send req if failed push back to qeue
-    # queue_name = to
-    # connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
-    # channel = connection.channel()
-    # channel.queue_declare(queue=queue_name)
-    # channel.basic_publish(exchange='',
-    #                       routing_key=queue_name,
-    #                       body=json.dumps(message))
-    # connection.close()
-    #
-    # logging.basicConfig(filename='log.txt',
-    #                     filemode='a',
-    #                     format='%(asctime)s ---> %(message)s',
-    #                     datefmt='%H:%M:%S',
-    #                     level=logging.CRITICAL)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=CONFIG['RabbitMQServer']))
+        channel = connection.channel()
+        channel.basic_publish(exchange='', routing_key=CONFIG['RabbitMQQueue'], body=json.dumps(message))
+        connection.close()
 
     end = datetime.datetime.now()
     elapsed = end - start
