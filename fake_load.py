@@ -1,7 +1,8 @@
 import asyncio
+
 import aiohttp
-import tqdm
 import async_timeout
+import tqdm
 
 
 async def fetch(session, url):
@@ -13,14 +14,15 @@ async def fetch(session, url):
 async def run(r):
     url = "http://192.168.5.34/exam"
     # The default connection is only 20 - you want to stress...
-    conn = aiohttp.TCPConnector(limit=10000)
+    conn = aiohttp.TCPConnector(limit=200)
     tasks, responses = [], []
     async with aiohttp.ClientSession(connector=conn) as session:
         tasks = [asyncio.ensure_future(fetch(session, url)) for _ in range(r)]
-        #This will show you some progress bar on the responses
+        # This will show you some progress bar on the responses
         for f in tqdm.tqdm(asyncio.as_completed(tasks), total=len(tasks)):
             responses.append(await f)
     return responses
+
 
 number = 10000
 loop = asyncio.get_event_loop()
