@@ -21,12 +21,15 @@ channel.queue_declare(queue=CONFIG['RabbitMQQueue'])
 
 async def handle(request):
     data = await request.post()
+    if 'Authorization' not in request.headers:
+        return web.HTTPUnauthorized()
     response = dict(data)
     try:
         jsons = await request.json()
         response.update(jsons)
     except:
         pass
+
     response.update({
         'method': request.method,
         'url': request.path,
