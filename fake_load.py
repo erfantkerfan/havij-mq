@@ -24,6 +24,6 @@ async def run(r):
     return responses
 
 
-number = 10000
+number = 100000
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run(number))

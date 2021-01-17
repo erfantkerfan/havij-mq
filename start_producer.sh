@@ -1,0 +1,1 @@
+sudo gunicorn producer:run --bind localhost:600 --workers 10 --worker-class aiohttp.GunicornWebWorker
