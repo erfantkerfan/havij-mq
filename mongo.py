@@ -12,12 +12,14 @@ collection = db.get_collection('logs')
 # cursor = collection.find({}).limit(500)
 cursor = collection.find({}, no_cursor_timeout=True)
 
+SIMULTANEOUS_THREADS = 100
+THREADING = False
+
 HEADERS = {
     'Accept': 'application/json',
     'Cookie': 'nocache=1',
     'Accept-Encoding': 'utf-8'
 }
-
 STATUS_CODES = dict()
 
 
@@ -43,20 +45,18 @@ def send_request(message):
     STATUS_CODES.setdefault(status_code, 0)
     STATUS_CODES[status_code] += 1
 
-    # if status_code != 200:
-    #     print(status_code)
-    #     print(response.text)
-
 
 threads = []
 for message in tqdm(cursor, desc='making requests ', unit=' request', ncols=250):
     try:
-        # while threading.activeCount() > 100:
-        #     pass
-        # threads = [t for t in threads if t.is_alive()]
-        # threads.append(Thread(target=send_request, args=(message,)))
-        # threads[-1].start()
-        send_request(message)
+        if THREADING:
+            while threading.activeCount() > SIMULTANEOUS_THREADS:
+                pass
+            threads = [t for t in threads if t.is_alive()]
+            threads.append(Thread(target=send_request, args=(message,)))
+            threads[-1].start()
+        else:
+            send_request(message)
     except KeyboardInterrupt:
         sys.exit()
     except:
