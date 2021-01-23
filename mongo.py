@@ -10,7 +10,7 @@ client = MongoClient('127.0.0.1')
 db = client.get_database('3a_new')
 collection = db.get_collection('logs')
 # cursor = collection.find({}).limit(500)
-cursor = collection.find({})
+cursor = collection.find({}, no_cursor_timeout=True)
 
 HEADERS = {
     'Accept': 'application/json',
@@ -33,8 +33,12 @@ def send_request(message):
     pass
     temp = HEADERS
     temp['Authorization'] = 'Bearer ' + message['token']
-    response = requests.request(message['method'], 'http://192.168.4.3:500' + message['url'], headers=temp,
-                                data=message)
+    if message['method'] == 'GET':
+        response = requests.request(message['method'], 'http://192.168.4.3:500' + message['url'], headers=temp,
+                                    params=message)
+    else:
+        response = requests.request(message['method'], 'http://192.168.4.3:500' + message['url'], headers=temp,
+                                    data=message)
     status_code = response.status_code
     STATUS_CODES.setdefault(status_code, 0)
     STATUS_CODES[status_code] += 1
@@ -47,11 +51,12 @@ def send_request(message):
 threads = []
 for message in tqdm(cursor, desc='making requests ', unit=' request', ncols=250):
     try:
-        while threading.activeCount() > 100:
-            pass
-        threads = [t for t in threads if t.is_alive()]
-        threads.append(Thread(target=send_request, args=(message,)))
-        threads[-1].start()
+        # while threading.activeCount() > 100:
+        #     pass
+        # threads = [t for t in threads if t.is_alive()]
+        # threads.append(Thread(target=send_request, args=(message,)))
+        # threads[-1].start()
+        send_request(message)
     except KeyboardInterrupt:
         sys.exit()
     except:
