@@ -40,6 +40,7 @@ def send_request(message):
     temp_header['Authorization'] = 'Bearer ' + message['token']
     temp_data = message['parameter']
     temp_data['log_id'] = message['_id']
+    temp_data['created_at'] = message['created_at']
     response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, data=temp_data)
     status_code = response.status_code
     STATUS_CODES.setdefault(status_code, 0)
