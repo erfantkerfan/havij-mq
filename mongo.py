@@ -38,7 +38,9 @@ def send_request(message):
     pass
     temp_header = headers
     temp_header['Authorization'] = 'Bearer ' + message['token']
-    response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, data=message['parameter'])
+    temp_data = message['parameter']
+    temp_data['log_id'] = message['_id']
+    response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, data=temp_data)
     status_code = response.status_code
     STATUS_CODES.setdefault(status_code, 0)
     STATUS_CODES[status_code] += 1
