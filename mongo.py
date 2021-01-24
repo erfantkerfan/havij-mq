@@ -6,16 +6,19 @@ import requests
 from pymongo import MongoClient
 from tqdm import tqdm
 
-client = MongoClient('127.0.0.1')
-db = client.get_database('3a_new')
+SIMULTANEOUS_THREADS = 100
+THREADING = False
+SERVER_URL = 'http://192.168.4.3:500'
+SERVER_MONGO = '192.168.4.3'
+MONGO_DB = '3a_new'
+
+client = MongoClient(SERVER_MONGO)
+db = client.get_database(MONGO_DB)
 collection = db.get_collection('logs')
 # cursor = collection.find({}).limit(500)
 cursor = collection.find({}, no_cursor_timeout=True)
 
-SIMULTANEOUS_THREADS = 100
-THREADING = False
-
-HEADERS = {
+headers = {
     'Accept': 'application/json',
     'Cookie': 'nocache=1',
     'Accept-Encoding': 'utf-8'
@@ -33,14 +36,9 @@ print_log()
 
 def send_request(message):
     pass
-    temp = HEADERS
-    temp['Authorization'] = 'Bearer ' + message['token']
-    if message['method'] == 'GET':
-        response = requests.request(message['method'], 'http://192.168.4.3:500' + message['url'], headers=temp,
-                                    params=message)
-    else:
-        response = requests.request(message['method'], 'http://192.168.4.3:500' + message['url'], headers=temp,
-                                    data=message)
+    temp_header = headers
+    temp_header['Authorization'] = 'Bearer ' + message['token']
+    response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, data=message['parameter'])
     status_code = response.status_code
     STATUS_CODES.setdefault(status_code, 0)
     STATUS_CODES[status_code] += 1
