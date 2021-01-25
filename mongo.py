@@ -18,7 +18,7 @@ client = MongoClient(SERVER_MONGO)
 db = client.get_database(MONGO_DB)
 collection = db.get_collection('logs')
 # cursor = collection.find({'_id': ObjectId("6003c31ebf8cdd46074c8314")})
-cursor = collection.find({'url': {'$regex': 'temp-exam', '$options': 'i'}, 'method': 'POST'})
+cursor = collection.find({'url': {'$regex': 'temp-exam', '$options': 'i'}, 'method': 'POST'}, no_cursor_timeout=True)
 
 headers = {
     'Accept': 'application/json',
