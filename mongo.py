@@ -9,7 +9,7 @@ from pymongo import MongoClient
 from tqdm import tqdm
 
 SIMULTANEOUS_THREADS = 100
-THREADING = False
+THREADING = True
 SERVER_URL = 'http://192.168.4.3:500'
 SERVER_MONGO = '192.168.4.3'
 MONGO_DB = '3a_new'
