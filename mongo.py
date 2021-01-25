@@ -1,7 +1,6 @@
 import json
 import sys
 import threading
-from pprint import pprint
 from threading import Thread
 
 import requests
@@ -29,22 +28,25 @@ headers = {
 }
 STATUS_CODES = dict()
 
+
 def print_log():
     threading.Timer(10.0, print_log).start()
     print(STATUS_CODES)
 
+
 print_log()
+
 
 def parse_json(data):
     return json.loads(json_util.dumps(data))
 
+
 def send_request(message):
     temp_header = headers
     temp_header['Authorization'] = 'Bearer ' + message['token']
-    temp_data = message['parameter']
-    temp_data['log_id'] = message['_id']
-    temp_data['created_at'] = message['created_at']
-    temp_data = parse_json(temp_data)
+    temp_data = parse_json(message['parameter'])
+    temp_data['log_id'] = str(message['_id'])
+    temp_data['created_at'] = message['created_at'].strftime('%Y-%m-%d %H:%M:%S')
     if message['method'] == 'GET':
         response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, data=temp_data)
     else:
