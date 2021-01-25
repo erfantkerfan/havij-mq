@@ -4,13 +4,13 @@ import threading
 from threading import Thread
 
 import requests
-from bson import ObjectId, json_util
+from bson import json_util, ObjectId
 from pymongo import MongoClient
 from tqdm import tqdm
 
 SIMULTANEOUS_THREADS = 100
 THREADING = False
-SERVER_URL = 'http://192.168.4.3:500'
+SERVER_URL = 'http://127.0.0.1:500'
 SERVER_MONGO = '192.168.4.3'
 MONGO_DB = '3a_new'
 
@@ -30,10 +30,12 @@ STATUS_CODES = dict()
 
 
 def print_log():
-    threading.Timer(10.0, print_log).start()
-    print(STATUS_CODES)
+    if logger:
+        threading.Timer(10.0, print_log).start()
+        print(STATUS_CODES)
 
 
+logger = True
 print_log()
 
 
@@ -47,13 +49,11 @@ def send_request(message):
     temp_data = parse_json(message['parameter'])
     temp_data['log_id'] = str(message['_id'])
     temp_data['created_at'] = message['created_at'].strftime('%Y-%m-%d %H:%M:%S')
-    if message['method'] == 'GET':
-        response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, data=temp_data)
-    else:
+    if message['method'] == 'POST' and 'temp-exam' in message['url']:
         response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, json=temp_data)
-    status_code = response.status_code
-    STATUS_CODES.setdefault(status_code, 0)
-    STATUS_CODES[status_code] += 1
+        status_code = response.status_code
+        STATUS_CODES.setdefault(status_code, 0)
+        STATUS_CODES[status_code] += 1
 
 
 threads = []
@@ -70,9 +70,10 @@ for message in tqdm(cursor, desc='making requests ', unit=' request', ncols=250)
     except KeyboardInterrupt:
         sys.exit()
     except Exception as error:
-        print('thread failed ' + error)
+        print('thread failed ' + str(error))
 cursor.close()
 while any([t.is_alive for t in threads]):
     threads = [t for t in threads if t.is_alive()]
 
+logger = False
 print(STATUS_CODES)
