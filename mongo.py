@@ -10,15 +10,15 @@ from tqdm import tqdm
 
 SIMULTANEOUS_THREADS = 100
 THREADING = False
-SERVER_URL = 'http://127.0.0.1:500'
+SERVER_URL = 'http://192.168.4.3:500'
 SERVER_MONGO = '192.168.4.3'
 MONGO_DB = '3a_new'
 
 client = MongoClient(SERVER_MONGO)
 db = client.get_database(MONGO_DB)
 collection = db.get_collection('logs')
-cursor = collection.find({'_id': ObjectId("6003c31ebf8cdd46074c8314")})
-# cursor = collection.find({}, no_cursor_timeout=True)
+# cursor = collection.find({'_id': ObjectId("6003c31ebf8cdd46074c8314")})
+cursor = collection.find({}, no_cursor_timeout=True)
 
 headers = {
     'Accept': 'application/json',
@@ -44,12 +44,12 @@ def parse_json(data):
 
 
 def send_request(message):
-    temp_header = headers
-    temp_header['Authorization'] = 'Bearer ' + message['token']
-    temp_data = parse_json(message['parameter'])
-    temp_data['log_id'] = str(message['_id'])
-    temp_data['created_at'] = message['created_at'].strftime('%Y-%m-%d %H:%M:%S')
     if message['method'] == 'POST' and 'temp-exam' in message['url']:
+        temp_header = headers
+        temp_header['Authorization'] = 'Bearer ' + message['token']
+        temp_data = parse_json(message['parameter'])
+        temp_data['log_id'] = str(message['_id'])
+        temp_data['created_at'] = message['created_at'].strftime('%Y-%m-%d %H:%M:%S')
         response = requests.request(message['method'], SERVER_URL + message['url'], headers=temp_header, json=temp_data)
         status_code = response.status_code
         STATUS_CODES.setdefault(status_code, 0)
