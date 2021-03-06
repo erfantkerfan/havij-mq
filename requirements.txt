@@ -1,6 +1,6 @@
-requests~=2.24.0
-pika~=1.1.0
-python-dotenv~=0.14.0
-tqdm~=4.49.0
+requests~=2.25.1
+pika~=1.2.0
+python-dotenv~=0.15.0
+tqdm~=4.59.0
 aiohttp~=3.7.3
 gunicorn~=20.0.4
