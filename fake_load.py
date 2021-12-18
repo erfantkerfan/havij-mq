@@ -12,7 +12,8 @@ async def fetch(session, url):
 
 
 async def run(r):
-    url = "http://192.168.5.34/exam"
+    # url = "http://192.168.5.34/exam"
+    url = "https://san-ghaem.sbu.ac.ir"
     # The default connection is only 20 - you want to stress...
     conn = aiohttp.TCPConnector(limit=200)
     tasks, responses = [], []
@@ -24,6 +25,6 @@ async def run(r):
     return responses
 
 
-number = 100000
+number = 200000
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run(number))
